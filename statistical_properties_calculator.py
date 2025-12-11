@@ -128,12 +128,12 @@ class StatisticalPropertiesCalculator:
         }
 
 if __name__ == '__main__':
-    matches = pd.read_csv('data/results.csv')
+    matches = pd.read_csv('original_data/results.csv')
     matches['date'] = pd.to_datetime(matches['date'])
     
     baseline_matches = matches[
-        (matches['date'].dt.year >= 2019) &
-        (matches['date'].dt.year <= 2022)
+        (matches['date'].dt.year >= 2021) &
+        (matches['date'].dt.year <= 2024)
     ]
     
     calculator = StatisticalPropertiesCalculator(baseline_matches)

@@ -1,11 +1,11 @@
 {
-  "total_matches": 1838,
-  "home_win_prob": 0.5217627856365615,
-  "draw_prob": 0.14363438520130578,
-  "away_win_prob": 0.33460282916213274,
-  "home_advantage": 0.1871599564744288,
-  "avg_home_goals": 2.2225244831338413,
-  "avg_away_goals": 1.4776931447225246,
-  "avg_total_goals": 3.7002176278563654,
-  "home_goal_advantage": 0.7448313384113168
+  "total_matches": 2361,
+  "home_win_prob": 0.5040237187632359,
+  "draw_prob": 0.156289707750953,
+  "away_win_prob": 0.3396865734858111,
+  "home_advantage": 0.16433714527742482,
+  "avg_home_goals": 2.027954256670902,
+  "avg_away_goals": 1.4629394324438798,
+  "avg_total_goals": 3.490893689114782,
+  "home_goal_advantage": 0.5650148242270223
 }
