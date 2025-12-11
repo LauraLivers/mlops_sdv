@@ -1,0 +1,146 @@
+[
+  {
+    "period_filled": "2017-2020",
+    "training_size": 2352,
+    "original_matches": 1727,
+    "augmented_matches": 2352,
+    "synthetic_added": 625,
+    "total_dataset_size": 11636,
+    "output_file": "augmented_periods/period_2017_2020.csv"
+  },
+  {
+    "period_filled": "2013-2016",
+    "training_size": 4704,
+    "original_matches": 1447,
+    "augmented_matches": 2352,
+    "synthetic_added": 905,
+    "total_dataset_size": 12541,
+    "output_file": "augmented_periods/period_2013_2016.csv"
+  },
+  {
+    "period_filled": "2009-2012",
+    "training_size": 7056,
+    "original_matches": 1279,
+    "augmented_matches": 2352,
+    "synthetic_added": 1073,
+    "total_dataset_size": 13614,
+    "output_file": "augmented_periods/period_2009_2012.csv"
+  },
+  {
+    "period_filled": "2005-2008",
+    "training_size": 9408,
+    "original_matches": 1077,
+    "augmented_matches": 2352,
+    "synthetic_added": 1275,
+    "total_dataset_size": 14889,
+    "output_file": "augmented_periods/period_2005_2008.csv"
+  },
+  {
+    "period_filled": "2001-2004",
+    "training_size": 11760,
+    "original_matches": 845,
+    "augmented_matches": 2352,
+    "synthetic_added": 1507,
+    "total_dataset_size": 16396,
+    "output_file": "augmented_periods/period_2001_2004.csv"
+  },
+  {
+    "period_filled": "1997-2000",
+    "training_size": 14112,
+    "original_matches": 639,
+    "augmented_matches": 2352,
+    "synthetic_added": 1713,
+    "total_dataset_size": 18109,
+    "output_file": "augmented_periods/period_1997_2000.csv"
+  },
+  {
+    "period_filled": "1993-1996",
+    "training_size": 16464,
+    "original_matches": 410,
+    "augmented_matches": 2352,
+    "synthetic_added": 1942,
+    "total_dataset_size": 20051,
+    "output_file": "augmented_periods/period_1993_1996.csv"
+  },
+  {
+    "period_filled": "1989-1992",
+    "training_size": 18816,
+    "original_matches": 232,
+    "augmented_matches": 2352,
+    "synthetic_added": 2120,
+    "total_dataset_size": 22171,
+    "output_file": "augmented_periods/period_1989_1992.csv"
+  },
+  {
+    "period_filled": "1985-1988",
+    "training_size": 21168,
+    "original_matches": 197,
+    "augmented_matches": 2352,
+    "synthetic_added": 2155,
+    "total_dataset_size": 24326,
+    "output_file": "augmented_periods/period_1985_1988.csv"
+  },
+  {
+    "period_filled": "1981-1984",
+    "training_size": 23520,
+    "original_matches": 130,
+    "augmented_matches": 2352,
+    "synthetic_added": 2222,
+    "total_dataset_size": 26548,
+    "output_file": "augmented_periods/period_1981_1984.csv"
+  },
+  {
+    "period_filled": "1977-1980",
+    "training_size": 25872,
+    "original_matches": 50,
+    "augmented_matches": 2352,
+    "synthetic_added": 2302,
+    "total_dataset_size": 28850,
+    "output_file": "augmented_periods/period_1977_1980.csv"
+  },
+  {
+    "period_filled": "1973-1976",
+    "training_size": 28224,
+    "original_matches": 19,
+    "augmented_matches": 2352,
+    "synthetic_added": 2333,
+    "total_dataset_size": 31183,
+    "output_file": "augmented_periods/period_1973_1976.csv"
+  },
+  {
+    "period_filled": "1969-1972",
+    "training_size": 30576,
+    "original_matches": 24,
+    "augmented_matches": 2352,
+    "synthetic_added": 2328,
+    "total_dataset_size": 33511,
+    "output_file": "augmented_periods/period_1969_1972.csv"
+  },
+  {
+    "period_filled": "1965-1968",
+    "training_size": 32928,
+    "original_matches": 0,
+    "augmented_matches": 2352,
+    "synthetic_added": 2352,
+    "total_dataset_size": 35863,
+    "output_file": "augmented_periods/period_1965_1968.csv"
+  },
+  {
+    "period_filled": "1961-1964",
+    "training_size": 35280,
+    "original_matches": 0,
+    "augmented_matches": 2352,
+    "synthetic_added": 2352,
+    "total_dataset_size": 38215,
+    "output_file": "augmented_periods/period_1961_1964.csv"
+  },
+  {
+    "period_filled": "1957-1960",
+    "training_size": 37632,
+    "original_matches": 4,
+    "augmented_matches": 2352,
+    "synthetic_added": 2348,
+    "total_dataset_size": 40563,
+    "output_file": "augmented_periods/period_1957_1960.csv"
+  }
+]

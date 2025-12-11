@@ -1,0 +1,130 @@
+[
+  {
+    "period": "2017-2020",
+    "original_matches": 1727,
+    "augmented_matches": 2352,
+    "synthetic_added": 625,
+    "total_dataset_size": 11636,
+    "output_file": "augmented_periods/period_2017_2020.csv"
+  },
+  {
+    "period": "2013-2016",
+    "original_matches": 1447,
+    "augmented_matches": 2352,
+    "synthetic_added": 905,
+    "total_dataset_size": 11916,
+    "output_file": "augmented_periods/period_2013_2016.csv"
+  },
+  {
+    "period": "2009-2012",
+    "original_matches": 1279,
+    "augmented_matches": 2352,
+    "synthetic_added": 1073,
+    "total_dataset_size": 12084,
+    "output_file": "augmented_periods/period_2009_2012.csv"
+  },
+  {
+    "period": "2005-2008",
+    "original_matches": 1077,
+    "augmented_matches": 2352,
+    "synthetic_added": 1275,
+    "total_dataset_size": 12286,
+    "output_file": "augmented_periods/period_2005_2008.csv"
+  },
+  {
+    "period": "2001-2004",
+    "original_matches": 845,
+    "augmented_matches": 2352,
+    "synthetic_added": 1507,
+    "total_dataset_size": 12518,
+    "output_file": "augmented_periods/period_2001_2004.csv"
+  },
+  {
+    "period": "1997-2000",
+    "original_matches": 639,
+    "augmented_matches": 2352,
+    "synthetic_added": 1713,
+    "total_dataset_size": 12724,
+    "output_file": "augmented_periods/period_1997_2000.csv"
+  },
+  {
+    "period": "1993-1996",
+    "original_matches": 410,
+    "augmented_matches": 2352,
+    "synthetic_added": 1942,
+    "total_dataset_size": 12953,
+    "output_file": "augmented_periods/period_1993_1996.csv"
+  },
+  {
+    "period": "1989-1992",
+    "original_matches": 232,
+    "augmented_matches": 2352,
+    "synthetic_added": 2120,
+    "total_dataset_size": 13131,
+    "output_file": "augmented_periods/period_1989_1992.csv"
+  },
+  {
+    "period": "1985-1988",
+    "original_matches": 197,
+    "augmented_matches": 2352,
+    "synthetic_added": 2155,
+    "total_dataset_size": 13166,
+    "output_file": "augmented_periods/period_1985_1988.csv"
+  },
+  {
+    "period": "1981-1984",
+    "original_matches": 130,
+    "augmented_matches": 2352,
+    "synthetic_added": 2222,
+    "total_dataset_size": 13233,
+    "output_file": "augmented_periods/period_1981_1984.csv"
+  },
+  {
+    "period": "1977-1980",
+    "original_matches": 50,
+    "augmented_matches": 2352,
+    "synthetic_added": 2302,
+    "total_dataset_size": 13313,
+    "output_file": "augmented_periods/period_1977_1980.csv"
+  },
+  {
+    "period": "1973-1976",
+    "original_matches": 19,
+    "augmented_matches": 2352,
+    "synthetic_added": 2333,
+    "total_dataset_size": 13344,
+    "output_file": "augmented_periods/period_1973_1976.csv"
+  },
+  {
+    "period": "1969-1972",
+    "original_matches": 24,
+    "augmented_matches": 2352,
+    "synthetic_added": 2328,
+    "total_dataset_size": 13339,
+    "output_file": "augmented_periods/period_1969_1972.csv"
+  },
+  {
+    "period": "1965-1968",
+    "original_matches": 0,
+    "augmented_matches": 0,
+    "synthetic_added": 0,
+    "total_dataset_size": 11011,
+    "output_file": "augmented_periods/period_1965_1968.csv"
+  },
+  {
+    "period": "1961-1964",
+    "original_matches": 0,
+    "augmented_matches": 0,
+    "synthetic_added": 0,
+    "total_dataset_size": 11011,
+    "output_file": "augmented_periods/period_1961_1964.csv"
+  },
+  {
+    "period": "1957-1960",
+    "original_matches": 4,
+    "augmented_matches": 2352,
+    "synthetic_added": 2348,
+    "total_dataset_size": 13359,
+    "output_file": "augmented_periods/period_1957_1960.csv"
+  }
+]
