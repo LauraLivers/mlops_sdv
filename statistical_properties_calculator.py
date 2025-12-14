@@ -131,11 +131,41 @@ class StatisticalPropertiesCalculator:
 
 def process_all_scored_matches():
     scored_dir = Path('scored_matches')
+    filled_dir = Path('filled_matches')
     properties_dir = Path('properties')
     properties_dir.mkdir(parents=True, exist_ok=True)
     
-    # Process original data
-    print("Processing original data...")
+    # Process baseline per period from filled_matches
+    print("Processing baseline data per period...")
+    if filled_dir.exists():
+        period_files = sorted(filled_dir.glob('period_*.csv'), reverse=True)
+        print(f"Found {len(period_files)} baseline periods")
+        
+        for period_file in period_files:
+            period_name = period_file.stem
+            
+            try:
+                matches = pd.read_csv(period_file)
+                # Keep only original matches (not synthetic)
+                if 'is_synthetic' in matches.columns:
+                    original_matches = matches[matches['is_synthetic'] == False].copy()
+                else:
+                    original_matches = matches.copy()
+                
+                calculator = StatisticalPropertiesCalculator(original_matches)
+                calculator.save_properties(f'baseline_{period_name}', properties_dir)
+                
+                aggregate = calculator.calculate_aggregate_properties()
+                print(f"  {period_name}: {aggregate['total_matches']} matches")
+                
+            except Exception as e:
+                print(f"  Error processing {period_name}: {e}")
+                continue
+    else:
+        print(f"Warning: {filled_dir} not found, skipping baseline per period")
+    
+    # Process overall baseline
+    print("\nProcessing overall baseline...")
     original_data = pd.read_csv('original_data/og/results.csv')
     calculator = StatisticalPropertiesCalculator(original_data)
     calculator.save_properties('baseline', properties_dir)
@@ -155,6 +185,10 @@ def process_all_scored_matches():
             print(f"\nSkipping {model}: directory not found")
             continue
         
+        # Create model subdirectory
+        model_props_dir = properties_dir / f'prop_{model}'
+        model_props_dir.mkdir(parents=True, exist_ok=True)
+        
         period_files = sorted(model_dir.glob('period_*.csv'), reverse=True)
         
         print(f"\nProcessing {model} ({len(period_files)} periods)")
@@ -166,7 +200,7 @@ def process_all_scored_matches():
                 matches = pd.read_csv(period_file)
                 
                 calculator = StatisticalPropertiesCalculator(matches)
-                calculator.save_properties(f'{model}_{period_name}', properties_dir)
+                calculator.save_properties(f'{model}_{period_name}', model_props_dir)
                 
                 aggregate = calculator.calculate_aggregate_properties()
                 print(f"  {period_name}: {aggregate['total_matches']} matches")

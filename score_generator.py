@@ -20,7 +20,7 @@ else:
 
 
 class ScoreGenerator:
-    def __init__(self, historical_data_path='original_data/results.csv'):
+    def __init__(self, historical_data_path='original_data/og/results.csv'):
         df = pd.read_csv(historical_data_path)
         self.team_stats = self._calculate_team_stats(df)
         self.stage_stats = self._calculate_stage_stats(df)
@@ -196,22 +196,56 @@ class ScoreGenerator:
         
         for model in ['poisson', 'ctgan', 'gaussian_copula', 'copulagan', 'tvae']:
             output_dir = Path(f'scored_matches/{model}')
-            
-            if output_dir.exists() and len(list(output_dir.glob('*.csv'))) == len(periods):
-                continue
-            
             output_dir.mkdir(parents=True, exist_ok=True)
+            
+            print(f"\nProcessing {model}...")
+            previous_scored_df = None
             
             for period in tqdm(periods, desc=f"{model:20s}"):
                 self.trained_models = {}
                 input_file = f'filled_matches/period_{period}.csv'
-                df = pd.read_csv(input_file)
-                df['date'] = pd.to_datetime(df['date'])
+                current_df = pd.read_csv(input_file)
+                current_df['date'] = pd.to_datetime(current_df['date'])
                 
-                scored_df = self.generate_scores(df, model)
+                if previous_scored_df is None:
+                    # First period: score everything
+                    scored_df = self.generate_scores(current_df, model)
+                else:
+                    # Subsequent periods: only score NEW matches
+                    # Get matches that are in current but not in previous
+                    current_df['match_key'] = (
+                        current_df['date'].astype(str) + '_' +
+                        current_df['home_team'] + '_' +
+                        current_df['away_team']
+                    )
+                    previous_scored_df['match_key'] = (
+                        previous_scored_df['date'].astype(str) + '_' +
+                        previous_scored_df['home_team'] + '_' +
+                        previous_scored_df['away_team']
+                    )
+                    
+                    # Find new matches
+                    new_matches_mask = ~current_df['match_key'].isin(previous_scored_df['match_key'])
+                    new_matches = current_df[new_matches_mask].copy()
+                    new_matches = new_matches.drop(columns=['match_key'])
+                    
+                    # Score only new matches
+                    if len(new_matches) > 0:
+                        new_scored = self.generate_scores(new_matches, model)
+                        
+                        # Combine previous scored matches with newly scored matches
+                        previous_scored_df = previous_scored_df.drop(columns=['match_key'])
+                        scored_df = pd.concat([previous_scored_df, new_scored], ignore_index=True)
+                    else:
+                        # No new matches, just use previous
+                        scored_df = previous_scored_df.drop(columns=['match_key'])
                 
+                # Save current scored file
                 output_file = output_dir / f'period_{period}.csv'
                 scored_df.to_csv(output_file, index=False)
+                
+                # Keep for next iteration
+                previous_scored_df = scored_df.copy()
 
 
 def main():
