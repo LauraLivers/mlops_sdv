@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import json
-import os
+from pathlib import Path
 
 class StatisticalPropertiesCalculator:
     def __init__(self, matches_df):
@@ -112,38 +112,71 @@ class StatisticalPropertiesCalculator:
         
         return aggregate
     
-    def save_properties(self, output_prefix, output_dir='properties'):
-        os.makedirs(output_dir, exist_ok=True)
+    def save_properties(self, output_name, output_dir='properties'):
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
         
         team_props = self.calculate_all_teams()
-        team_props.to_csv(f'{output_dir}/{output_prefix}_team_properties.csv', index=False)
+        team_props.to_csv(output_dir / f'{output_name}_team_properties.csv', index=False)
         
         aggregate_props = self.calculate_aggregate_properties()
-        with open(f'{output_dir}/{output_prefix}_aggregate_properties.json', 'w') as f:
+        with open(output_dir / f'{output_name}_aggregate_properties.json', 'w') as f:
             json.dump(aggregate_props, f, indent=2)
         
         return {
-            'team_properties': f'{output_dir}/{output_prefix}_team_properties.csv',
-            'aggregate_properties': f'{output_dir}/{output_prefix}_aggregate_properties.json'
+            'team_properties': str(output_dir / f'{output_name}_team_properties.csv'),
+            'aggregate_properties': str(output_dir / f'{output_name}_aggregate_properties.json')
         }
 
-if __name__ == '__main__':
-    matches = pd.read_csv('original_data/results.csv')
-    matches['date'] = pd.to_datetime(matches['date'])
+
+def process_all_scored_matches():
+    scored_dir = Path('scored_matches')
+    properties_dir = Path('properties')
+    properties_dir.mkdir(parents=True, exist_ok=True)
     
-    baseline_matches = matches[
-        (matches['date'].dt.year >= 2021) &
-        (matches['date'].dt.year <= 2024)
-    ]
-    
-    calculator = StatisticalPropertiesCalculator(baseline_matches)
-    files = calculator.save_properties('baseline')
-    
+    # Process original data
+    print("Processing original data...")
+    original_data = pd.read_csv('original_data/og/results.csv')
+    calculator = StatisticalPropertiesCalculator(original_data)
+    calculator.save_properties('baseline', properties_dir)
     aggregate = calculator.calculate_aggregate_properties()
-    print("Baseline aggregate properties:")
-    for key, value in aggregate.items():
-        print(f"  {key}: {value:.4f}")
+    print(f"  baseline: {aggregate['total_matches']} matches")
     
-    print(f"\nSaved to:")
-    for key, path in files.items():
-        print(f"  {path}")
+    # Process each model's scored matches
+    if not scored_dir.exists():
+        print(f"\nError: {scored_dir} does not exist")
+        return
+    
+    models = ['poisson', 'ctgan', 'gaussian_copula', 'copulagan', 'tvae']
+    
+    for model in models:
+        model_dir = scored_dir / model
+        if not model_dir.exists():
+            print(f"\nSkipping {model}: directory not found")
+            continue
+        
+        period_files = sorted(model_dir.glob('period_*.csv'), reverse=True)
+        
+        print(f"\nProcessing {model} ({len(period_files)} periods)")
+        
+        for period_file in period_files:
+            period_name = period_file.stem
+            
+            try:
+                matches = pd.read_csv(period_file)
+                
+                calculator = StatisticalPropertiesCalculator(matches)
+                calculator.save_properties(f'{model}_{period_name}', properties_dir)
+                
+                aggregate = calculator.calculate_aggregate_properties()
+                print(f"  {period_name}: {aggregate['total_matches']} matches")
+                
+            except Exception as e:
+                print(f"  Error processing {period_name}: {e}")
+                continue
+
+
+if __name__ == '__main__':
+    print("Calculating statistical properties for all scored matches...")
+    process_all_scored_matches()
+    print("\nDone! Properties saved to properties/ directory")

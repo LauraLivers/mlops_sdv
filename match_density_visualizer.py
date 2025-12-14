@@ -46,26 +46,31 @@ class MatchDensityVisualizer:
         n_months = len(months)
         
         figwidth = 20
-        figheight = (n_years / n_months) * figwidth + 2
+        cell_height = 0.3  # Very short cells
+        figheight = n_years * cell_height
         
         sns.set_style("white")
         fig, ax = plt.subplots(figsize=(figwidth, figheight))
+        
+        ax.set_aspect('auto')
         
         sns.heatmap(
             grid_data,
             cmap='viridis',
             cbar=False,
-            linewidths=0.5,
-            linecolor='white',
+            linewidths=0.3,
+            linecolor='grey',
             ax=ax,
             xticklabels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            yticklabels=False,
+            yticklabels=years,
             square=False
         )
         
-        baseline_start_idx = years.index(self.baseline['end_year'])
-        baseline_end_idx = years.index(self.baseline['start_year'])
+        # Find baseline indices - years are sorted newest to oldest (descending)
+        baseline_start_idx = years.index(self.baseline['start_year'] - 1)
+        baseline_end_idx = years.index(self.baseline['end_year'] + 1)
         
+        # Rectangle: (x, y, width, height) where y is row index
         ax.add_patch(plt.Rectangle(
             (0, baseline_start_idx),
             12,
@@ -78,7 +83,7 @@ class MatchDensityVisualizer:
         ax.set_xlabel('Month', fontsize=18, labelpad=15)
         ax.set_ylabel('Year (newest to oldest)', fontsize=18, labelpad=15)
         ax.set_title(
-            f"Women's Football Match Density Over Time\nBaseline: {self.baseline['start_year'] + 1}-{self.baseline['end_year']-1}",
+            f"Women's Football Match Density Over Time\nBaseline: {self.baseline['start_year']}-{self.baseline['end_year']}",
             fontsize=68,
             pad=60,
             fontweight='bold'
@@ -88,17 +93,19 @@ class MatchDensityVisualizer:
         return fig
     
     def save_visualization(self, output_filename='match_density.png'):
+        Path('visualizations/match_density').mkdir(parents=True, exist_ok=True)
+        output_path = Path('visualizations/match_density') / output_filename
         fig = self.create_visualization()
-        fig.savefig(output_filename, dpi=150, bbox_inches='tight')
+        fig.savefig(output_path, dpi=150, bbox_inches='tight')
         plt.close(fig)
-        return output_filename
+        return str(output_path)
 
 if __name__ == '__main__':
-    augmented_dir = Path('augmented_periods')
-    csv_files = list(augmented_dir.glob('*.csv'))
+    augmented_dir = Path('filled_matches')
+    csv_files = sorted(list(augmented_dir.glob('*.csv')), reverse=True)
     
     for idx, csv_path in enumerate(csv_files, start=1):
         visualizer = MatchDensityVisualizer(str(csv_path))
-        output_file = f'match_density_{idx}.png'
-        visualizer.save_visualization(output_file)
-        print(f"Visualization {idx} saved to: {output_file}")
+        output_file = f'match_density_{csv_path.stem}.png'
+        saved_path = visualizer.save_visualization(output_file)
+        print(f"Visualization {idx} saved to: {saved_path}")
