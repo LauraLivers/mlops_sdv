@@ -17,43 +17,23 @@ class AggregateVisualizer:
             '2005_2008', '2009_2012', '2013_2016', '2017_2020'
         ]
         
-        self.period_colors = {
-            '1957_1960': '#2C3E50', '1961_1964': '#34495E', '1965_1968': '#7F8C8D',
-            '1969_1972': '#95A5A6', '1973_1976': '#BDC3C7', '1977_1980': '#ECF0F1',
-            '1981_1984': '#3498DB', '1985_1988': '#5DADE2', '1989_1992': '#85C1E9',
-            '1993_1996': '#AED6F1', '1997_2000': '#D6EAF8', '2001_2004': '#E8F8F5',
-            '2005_2008': '#A3E4D7', '2009_2012': '#76D7C4', '2013_2016': '#48C9B0',
-            '2017_2020': '#1ABC9C'
+        self.model_colors = {
+            'poisson': '#11fa1d',
+            'ctgan': '#fa11e5',
+            'gaussian_copula': '#2404e1',
+            'copulagan': '#edc903',
+            'tvae': '#03e8ed'
         }
     
-    def visualize_single_model(self, model_name='gaussian_copula', display_name='GAUSSIAN_COPULA'):
-        output_dir = Path('visualizations/aggregate_comparison')
-        output_dir.mkdir(parents=True, exist_ok=True)
-        
+    def get_model_data(self, model_name):
         scored_dir = Path('scored_matches') / model_name
         if not scored_dir.exists():
-            print(f"No scored matches found for {model_name}")
-            return
+            return None, None
         
-        print(f"Processing {model_name}...")
+        all_years = []
+        all_values = []
         
-        baseline_df = pd.read_csv('original_data/og/results.csv')
-        baseline_df['date'] = pd.to_datetime(baseline_df['date'])
-        baseline_df['year'] = baseline_df['date'].dt.year
-        
-        baseline_by_year = baseline_df.groupby('year', as_index=False).apply(
-            lambda x: pd.Series({
-                'year': x.name,
-                'home_win_prob': (x['home_score'] > x['away_score']).mean()
-            }), include_groups=False
-        )
-        
-        fig, ax = plt.subplots(figsize=(24, 10))
-        
-        prev_end_year = None
-        prev_end_value = None
-        
-        for idx, period in enumerate(self.periods):
+        for period in self.periods:
             period_file = scored_dir / f'period_{period}.csv'
             if not period_file.exists():
                 continue
@@ -76,65 +56,128 @@ class AggregateVisualizer:
                 }), include_groups=False
             )
             
-            years = yearly_stats['year'].values
-            values = yearly_stats['home_win_prob'].values
+            all_years.extend(yearly_stats['year'].values)
+            all_values.extend(yearly_stats['home_win_prob'].values)
+        
+        if all_years:
+            return all_years, all_values
+        return None, None
+    
+    def visualize_progressive_models(self):
+        output_dir = Path('visualizations/aggregate_comparison')
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        baseline_df = pd.read_csv('original_data/og/results.csv')
+        baseline_df['date'] = pd.to_datetime(baseline_df['date'])
+        baseline_df['year'] = baseline_df['date'].dt.year
+        
+        baseline_by_year = baseline_df.groupby('year', as_index=False).apply(
+            lambda x: pd.Series({
+                'year': x.name,
+                'home_win_prob': (x['home_score'] > x['away_score']).mean()
+            }), include_groups=False
+        )
+        
+        model_order = ['gaussian_copula', 'poisson', 'ctgan', 'tvae']
+        
+        progressive_sets = [
+            (['baseline'], 'baseline'),
+            (['baseline', 'gaussian_copula'], 'baseline_gc'),
+            (['baseline', 'gaussian_copula', 'poisson'], 'baseline_gc_poisson'),
+            (['baseline', 'gaussian_copula', 'poisson', 'ctgan'], 'baseline_gc_poisson_ctgan'),
+            (['baseline', 'gaussian_copula', 'poisson', 'ctgan', 'tvae'], 'baseline_gc_poisson_ctgan_tvae')
+        ]
+        
+        for models_to_plot, filename in progressive_sets:
+            print(f"Creating plot: {filename}...")
             
-            if prev_end_year is not None and prev_end_value is not None:
-                boundary = start_year - 0.5
-                ax.fill_between([prev_end_year, boundary], [0, 0], 
-                               [prev_end_value, prev_end_value],
-                               color=self.period_colors[self.periods[idx-1]], alpha=0.6)
+            fig, ax = plt.subplots(figsize=(24, 10))
+            
+            ax.plot(baseline_by_year['year'], baseline_by_year['home_win_prob'],
+                   color='black', linewidth=4, linestyle='--', label='BASELINE',
+                   alpha=1.0, zorder=-1)
+            
+            for model_name in models_to_plot:
+                if model_name == 'baseline':
+                    continue
                 
-                years = np.concatenate([[boundary, start_year], years])
-                values = np.concatenate([[prev_end_value, values[0]], values])
+                years, values = self.get_model_data(model_name)
+                if years is not None:
+                    ax.plot(years, values,
+                           color=self.model_colors[model_name], linewidth=2.5, 
+                           label=model_name.upper().replace('_', ' '), alpha=0.8)
             
-            ax.fill_between(years, 0, values,
-                           color=self.period_colors[period], alpha=0.6, label=f'{period}')
+            ax.set_title('Home Win Probability Comparison',
+                        fontsize=16, fontweight='bold')
+            ax.set_xlabel('Year', fontsize=14, fontweight='bold')
+            ax.set_ylabel('Home Win Probability', fontsize=14, fontweight='bold')
+            ax.set_ylim(0, 1)
+            ax.legend(loc='best', fontsize=12)
+            ax.grid(True, alpha=0.2, linestyle=':')
             
-            ax.plot(years, values,
-                   color=self.period_colors[period], linewidth=2, alpha=0.9)
+            plt.tight_layout()
+            plt.savefig(output_dir / f'{filename}.png', dpi=300, bbox_inches='tight')
+            plt.close()
             
-            prev_end_year = end_year
-            prev_end_value = values[-1]
-            
-            if idx < len(self.periods) - 1:
-                ax.axvline(x=end_year + 0.5, color='black', linewidth=1.5, 
-                          linestyle='-', alpha=0.4, zorder=10)
+            print(f"  Saved: {output_dir}/{filename}.png")
+    
+    def visualize_tvae_highlight(self):
+        output_dir = Path('visualizations/aggregate_comparison')
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        print(f"Creating plot: tvae_highlight...")
+        
+        baseline_df = pd.read_csv('original_data/og/results.csv')
+        baseline_df['date'] = pd.to_datetime(baseline_df['date'])
+        baseline_df['year'] = baseline_df['date'].dt.year
+        
+        baseline_by_year = baseline_df.groupby('year', as_index=False).apply(
+            lambda x: pd.Series({
+                'year': x.name,
+                'home_win_prob': (x['home_score'] > x['away_score']).mean()
+            }), include_groups=False
+        )
+        
+        fig, ax = plt.subplots(figsize=(24, 10))
         
         ax.plot(baseline_by_year['year'], baseline_by_year['home_win_prob'],
-               color='red', linewidth=3, linestyle='-', label='Baseline',
-               alpha=1.0, zorder=20)
+               color='black', linewidth=4, linestyle='--', label='BASELINE',
+               alpha=1.0, zorder=-1)
         
-        ax.set_title(f'{display_name}: Home Win Probability by Period',
+        models_to_plot = ['gaussian_copula', 'poisson', 'ctgan', 'tvae']
+        
+        for model_name in models_to_plot:
+            years, values = self.get_model_data(model_name)
+            if years is not None:
+                if model_name == 'tvae':
+                    ax.plot(years, values,
+                           color=self.model_colors[model_name], linewidth=5, 
+                           label=model_name.upper().replace('_', ' '), alpha=1.0, zorder=10)
+                else:
+                    ax.plot(years, values,
+                           color=self.model_colors[model_name], linewidth=2.5, 
+                           label=model_name.upper().replace('_', ' '), alpha=0.8)
+        
+        ax.set_title('Home Win Probability Comparison - TVAE Best Performer',
                     fontsize=16, fontweight='bold')
         ax.set_xlabel('Year', fontsize=14, fontweight='bold')
         ax.set_ylabel('Home Win Probability', fontsize=14, fontweight='bold')
         ax.set_ylim(0, 1)
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=10, ncol=1)
+        ax.legend(loc='best', fontsize=12)
         ax.grid(True, alpha=0.2, linestyle=':')
         
         plt.tight_layout()
-        plt.savefig(output_dir / f'{model_name}_temporal_evolution.png', dpi=300, bbox_inches='tight')
+        plt.savefig(output_dir / 'tvae_highlight.png', dpi=300, bbox_inches='tight')
         plt.close()
         
-        print(f"Saved: {output_dir}/{model_name}_temporal_evolution.png")
+        print(f"  Saved: {output_dir}/tvae_highlight.png")
 
 
 def main():
-    print("Creating aggregate visualizations for all models...\n")
+    print("Creating progressive aggregate visualizations...\n")
     visualizer = AggregateVisualizer()
-    
-    model_configs = [
-        ('poisson', 'POISSON'),
-        ('ctgan', 'CTGAN'),
-        ('gaussian_copula', 'GAUSSIAN COPULA'),
-        ('copulagan', 'COPULAGAN'),
-        ('tvae', 'TVAE')
-    ]
-    
-    for model_name, display_name in model_configs:
-        visualizer.visualize_single_model(model_name, display_name)
-    
+    visualizer.visualize_progressive_models()
+    visualizer.visualize_tvae_highlight()
     print("\nAll visualizations complete!")
 
 

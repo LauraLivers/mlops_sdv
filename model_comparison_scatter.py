@@ -15,10 +15,10 @@ class ModelComparisonScatter:
         ]
         
         self.metrics = {
-            'avg_total_goals': 'Average Total Goals per Match',
-            'avg_home_goals': 'Average Home Goals per Match',
-            'avg_away_goals': 'Average Away Goals per Match',
-            'home_advantage': 'Home Advantage (Home Win % - Away Win %)'
+            'avg_total_goals': 'Deviation from Baseline: Total Goals per Match',
+            'avg_home_goals': 'Deviation from Baseline: Home Goals per Match',
+            'avg_away_goals': 'Deviation from Baseline: Away Goals per Match',
+            'home_advantage': 'Deviation from Baseline: Home Advantage'
         }
         
         self.model_colors = {
@@ -73,44 +73,42 @@ class ModelComparisonScatter:
             
             baseline_value = baseline_entire[metric_key]
             
-            all_values = []
+            all_deviations = []
             y_offset = 0
             
             for model in self.models:
-                model_values = []
+                model_deviations = []
                 
                 for period_idx, period in enumerate(self.periods):
                     model_vals = self.calculate_model_entire_file(model, period)
                     
                     if model_vals is not None:
-                        model_values.append(model_vals[metric_key])
+                        deviation = model_vals[metric_key] - baseline_value
+                        model_deviations.append(deviation)
                 
-                y_positions = [y_offset + i for i in range(len(model_values))]
+                y_positions = [y_offset + i for i in range(len(model_deviations))]
                 
-                for i, (val, y_pos) in enumerate(zip(model_values, y_positions)):
-                    alpha = 0.3 + (i / len(model_values)) * 0.7
+                for i, (dev, y_pos) in enumerate(zip(model_deviations, y_positions)):
+                    alpha = 0.3 + (i / len(model_deviations)) * 0.7
                     
-                    ax.scatter([val], [y_pos], 
+                    ax.scatter([dev], [y_pos], 
                               color=self.model_colors[model], s=200, alpha=alpha,
                               edgecolors='black', linewidth=2)
                 
-                if len(model_values) > 0:
+                if len(model_deviations) > 0:
                     ax.scatter([], [], color=self.model_colors[model], s=200, alpha=0.7,
                               edgecolors='black', linewidth=2, label=model.upper())
                 
-                all_values.extend(model_values)
-                y_offset += len(model_values) + 2
+                all_deviations.extend(model_deviations)
+                y_offset += len(model_deviations) + 2
             
-            all_values.append(baseline_value)
-            
-            ax.axvline(x=baseline_value, color='red', linewidth=3, 
+            ax.axvline(x=0, color='red', linewidth=3, 
                       linestyle=':', label='BASELINE', zorder=5, alpha=0.9)
             
-            if len(all_values) > 0:
-                min_val = min(all_values)
-                max_val = max(all_values)
-                margin = (max_val - min_val) * 0.05
-                ax.set_xlim(min_val - margin, max_val + margin)
+            if len(all_deviations) > 0:
+                max_abs = max(abs(min(all_deviations)), abs(max(all_deviations)))
+                margin = max_abs * 0.1
+                ax.set_xlim(-max_abs - margin, max_abs + margin)
             
             ax.set_ylim(-1, y_offset)
             
