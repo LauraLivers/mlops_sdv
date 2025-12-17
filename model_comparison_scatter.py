@@ -18,7 +18,8 @@ class ModelComparisonScatter:
             'avg_total_goals': 'Deviation from Baseline: Total Goals per Match',
             'avg_home_goals': 'Deviation from Baseline: Home Goals per Match',
             'avg_away_goals': 'Deviation from Baseline: Away Goals per Match',
-            'home_advantage': 'Deviation from Baseline: Home Advantage'
+            'home_advantage': 'Deviation from Baseline: Home Advantage',
+            'home_win_prob': 'Deviation from Baseline: Home Win Probability'
         }
         
         self.model_colors = {
@@ -39,7 +40,8 @@ class ModelComparisonScatter:
             'home_advantage': (
                 (baseline_df['home_score'] > baseline_df['away_score']).mean() -
                 (baseline_df['home_score'] < baseline_df['away_score']).mean()
-            )
+            ),
+            'home_win_prob': (baseline_df['home_score'] > baseline_df['away_score']).mean()
         }
     
     def calculate_model_entire_file(self, model_name, period):
@@ -57,7 +59,8 @@ class ModelComparisonScatter:
             'home_advantage': (
                 (df['home_score'] > df['away_score']).mean() -
                 (df['home_score'] < df['away_score']).mean()
-            )
+            ),
+            'home_win_prob': (df['home_score'] > df['away_score']).mean()
         }
     
     def create_scatter_comparison(self):

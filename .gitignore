@@ -1,3 +1,9 @@
 .venv/*
 __pycache__/*
 .DS_Store
+augmented_data/*
+filled_matches/*
+original_data/*
+properties/*
+scored_matches/*
+visualizations/*

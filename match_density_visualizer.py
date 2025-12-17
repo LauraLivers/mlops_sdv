@@ -55,7 +55,7 @@ class MatchDensityVisualizer:
         ax.set_aspect('auto')
         
         from matplotlib.colors import LinearSegmentedColormap
-        single_color = LinearSegmentedColormap.from_list('single_green', ['white', '#065F46'])
+        single_color = LinearSegmentedColormap.from_list('single_pink', ['white', '#E91E63'])
         
         sns.heatmap(
             grid_data,

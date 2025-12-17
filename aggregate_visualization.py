@@ -91,7 +91,7 @@ class AggregateVisualizer:
         for models_to_plot, filename in progressive_sets:
             print(f"Creating plot: {filename}...")
             
-            fig, ax = plt.subplots(figsize=(24, 10))
+            fig, ax = plt.subplots(figsize=(18,10))
             
             ax.plot(baseline_by_year['year'], baseline_by_year['home_win_prob'],
                    color='black', linewidth=4, linestyle='--', label='BASELINE',
@@ -138,7 +138,7 @@ class AggregateVisualizer:
             }), include_groups=False
         )
         
-        fig, ax = plt.subplots(figsize=(24, 10))
+        fig, ax = plt.subplots(figsize=(18, 10))
         
         ax.plot(baseline_by_year['year'], baseline_by_year['home_win_prob'],
                color='black', linewidth=4, linestyle='--', label='BASELINE',
