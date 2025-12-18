@@ -1,5 +1,7 @@
-## 0. Data Cleaning
-standardizing spelling
+## 0. Data Cleaning CLI
+download [original dataset](https://www.kaggle.com/datasets/martj42/womens-international-football-results/data) from kaggle
+
+- standardizing spelling
 ```
 sed -e 's/,Euro,/,UEFA Euro,/g' \
     -e 's/,European Championship,/,UEFA Euro,/g' \
@@ -12,19 +14,19 @@ sed -e 's/,Euro,/,UEFA Euro,/g' \
     -e 's/,OFC Championship,/,OFC Nations Cup,/g' \
     original_data/results.csv > cleaned_data/results_standardized.csv
 ```
-new col qualifiers
+- new col qualifiers
 ```
 awk -F',' 'NR==1 {print $0",qualifier"; next} 
            tolower($6) ~ /qualification|qualifying|qualifyication/ {print $0",1"; next} 
            {print $0",0"}' cleaned_data/results_standardized.csv > cleaned_data/results_standardized_qualifiers.csv
 ```
-clean up cities with commata
+- clean up cities with comma
 ```
 sed -i '' 's/"Washington, D.C."/Washington D.C./g; s/"Athens, Georgia"/Athens Georgia/g' cleaned_data/results_standardized_qualifiers.csv
 ```
 
-
-#### reference tables
+## 1. Data Engineering
+### reference tables used to connect teams and tournaments
 ```
 tail -n +2 cleaned_data/results_standardized_qualifiers.csv | cut -d',' -f7,8 | sort | uniq > reference_tables/city_country.csv
 
@@ -32,28 +34,13 @@ tail -n +2 cleaned_data/results_standardized_qualifiers.csv | awk -F',' '$6 !~ /
 
 tail -n +2 cleaned_data/results_standardized_qualifiers.csv | awk -F',' '{print $2","$8; print $3","$8}' | sort -u > reference_tables/team_country.csv
 ```
+## 2. filling the gaps and scoring the games
+1. Tournament stage labelling `historical_stage_labeller.py`
+2. fill the gaps so each 4-year period is as dense as the baseline period with `historical_gap_filler.py` 
+3. Score each synthetic match with SVD `score_generator.py` going in reverse. This will produce 16 `.csv` files with gradually more synthetic data. For the full set use the earliest period. 
 
-
-## 1. OG Dataset Analysis
-- properties
-- data cleaning: exclude homelesscup : done
-- handle disappearing countries (USSR, Yugoslawia, etc.) : 
-## 2. Verify ML Pipeline - Baseline
-
-## 3. Test SVD
-### 3.1 fill in the gaps - match density
-baseline: 2021 - 2024 (includes world cup, continental cups, olympics)  
-fill in the gaps in reverse order (the sparser the original period, the more data available to fill in)  
-- refinement 1: connect tournament, city, country for more realistic data
-- refinement 2: consider dates for more realistic data
-- refinement 3: connect team - country - neutral
-$\rightarrow$ verify properties are still in tact
-
-### constraints in SDV
-```python3 -c "from sdv import constraints; print(dir(constraints))"
-['Constraint', 'FixedCombinations', 'FixedIncrements', 'Inequality', 'Negative', 'OneHotEncoding', 'Positive', 'Range', 'ScalarInequality', 'ScalarRange', 'Unique', '__all__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__path__', '__spec__', 'base', 'create_custom_constraint_class', 'errors', 'tabular', 'utils']```
-
-### 3.2 fictional teams
-### 3.3 parallel Universe
-## 4. Bonus - league where Switzerland wins World Cup
+## 3. Visualisation
+-  model comparison for specific statistical property for overall data set `aggregate_visualization.py`
+- model comparison for specific statistical property for overall data set `model_comparison_scatter.py`
+- team ranking Europe comparison for CTGAN `team_ranking_visualizer.py`
 
