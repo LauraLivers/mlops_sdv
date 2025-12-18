@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/laura/Desktop/25 HS MLOPS/mlops_3/score_generator.py", line 1, in <module>
-    import pandas as pd
-ModuleNotFoundError: No module named 'pandas'

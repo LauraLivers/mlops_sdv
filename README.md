@@ -1,3 +1,9 @@
+# If the data won't play 
+## a take on datasynthesizers
+This repo was an experiment for the course MLOPS.hs25 at HSLU. The aim was to check whether [SDV](https://docs.sdv.dev/sdv) can hold its promise to augment a tabular dataset while leaving statistical properties intact.  
+Spoiler: It did not.
+![visualizations/aggregate_comparison/tvae_highlight.png](visualizations/aggregate_comparison/tvae_highlight.png)
+
 ## 0. Data Cleaning CLI
 download [original dataset](https://www.kaggle.com/datasets/martj42/womens-international-football-results/data) from kaggle
 
